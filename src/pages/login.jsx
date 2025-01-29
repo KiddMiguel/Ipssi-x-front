@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../redux/authSlice/authSlice';
-import '../styles/auth.css';
+import '../assets/styles/pages/auth.css';
 
 const Login = () => {
   const dispatch = useDispatch();

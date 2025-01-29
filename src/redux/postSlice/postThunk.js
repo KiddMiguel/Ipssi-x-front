@@ -1,4 +1,3 @@
-
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import myAxios from '../../utils/interceptor';
 
@@ -11,7 +10,7 @@ export const addPost = createAsyncThunk('post/addPost', async (data, { rejectWit
     }
 });
 
-export const getPosts = createAsyncThunk('post/getPosts', async ({rejectWithValue}) => {
+export const getPosts = createAsyncThunk('post/getPosts', async (_, { rejectWithValue }) => {
     try {
         const response = await myAxios.get('api/forum/');
         return response.data;
@@ -31,7 +30,10 @@ export const deletePost = createAsyncThunk('post/deletePost', async (id, { rejec
 
 export const getPostsBefore = createAsyncThunk('post/getPostsBefore', async (timestamp, { rejectWithValue }) => {
     try {
-        const response = await myAxios.get(`api/forum/before/${timestamp}`);
+        const state = getState();
+        const lastTimestamp = state.forum.lastTimestamp || Date.now();
+
+        const response = await myAxios.get(`/api/forum/before/${lastTimestamp}`);
         return response.data;
     } catch (error) {
         return rejectWithValue(error.response.data);

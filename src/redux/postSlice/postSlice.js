@@ -5,10 +5,21 @@ export const postSlice = createSlice({
     name: 'post',
     initialState: {
         posts: [],
+        hasMore: true,
+        loading : false,
+        lastTimestamp: null,
         status: 'idle',
         error: null
     },
     reducers: {
+        resetPosts: (state) => {
+            state.posts = [];
+            state.hasMore = true;
+            state.loading = false;
+            state.lastTimestamp = null;
+            state.status = 'idle';
+            state.error = null;
+        }
     },
     extraReducers: (builder) => {
         // Add Post
