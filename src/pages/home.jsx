@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import '../assets/styles/pages/home.css';
 const Home = () => {
   return (
