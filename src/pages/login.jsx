@@ -1,23 +1,35 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../redux/authSlice/authSlice';
 import '../styles/auth.css';
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { status, error } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Logique de connexion à implémenter
-    console.log('Login attempt:', formData);
+    try {
+      const result = await dispatch(login(formData)).unwrap();
+      if (result) {
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error('Erreur de connexion:', error);
+    }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-box">
         <h2>Connexion</h2>
+        {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <input
@@ -35,7 +47,14 @@ const Login = () => {
               onChange={(e) => setFormData({...formData, password: e.target.value})}
             />
           </div>
-          <button type="submit" className="auth-button">Se connecter</button>
+          <button 
+            type="submit" 
+            className="auth-button" 
+            disabled={status === 'loading'}
+          >
+            {status === 'loading' ? 'Connexion...' : 'Se connecter'}
+            
+          </button>
         </form>
         <p className="auth-link">
           Pas encore de compte ? <Link to="/register">S'inscrire</Link>
