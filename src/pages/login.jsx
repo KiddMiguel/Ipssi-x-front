@@ -16,7 +16,8 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const result = await dispatch(login(formData)).unwrap();
+      const result = await dispatch(login(formData));
+      console.log('result:', result);
       if (result) {
         navigate('/dashboard');
       }
@@ -53,7 +54,7 @@ const Login = () => {
             disabled={status === 'loading'}
           >
             {status === 'loading' ? 'Connexion...' : 'Se connecter'}
-            
+
           </button>
         </form>
         <p className="auth-link">

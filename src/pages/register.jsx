@@ -1,32 +1,43 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { register } from '../redux/authSlice/authSlice';
 import '../styles/auth.css';
 
 const Register = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { status, error } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState({
-    name: '',
+    username: '',
     email: '',
-    password: '',
-    confirmPassword: ''
+    password: ''
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Logique d'inscription à implémenter
-    console.log('Register attempt:', formData);
+      dispatch(register(formData));
   };
+
+  // Inscription okay
+  if (status === 'success') {
+    navigate('/posts');
+  }
+
+  console.log('error:', error);
 
   return (
     <div className="auth-container">
       <div className="auth-box">
         <h2>Inscription</h2>
+        {error && <div className="error-message">{error.message}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <input
               type="text"
-              placeholder="Nom"
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              placeholder="Nom d'utilisateur"
+              value={formData.username}
+              onChange={(e) => setFormData({...formData, username: e.target.value})}
             />
           </div>
           <div className="form-group">
@@ -45,15 +56,13 @@ const Register = () => {
               onChange={(e) => setFormData({...formData, password: e.target.value})}
             />
           </div>
-          <div className="form-group">
-            <input
-              type="password"
-              placeholder="Confirmer le mot de passe"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-            />
-          </div>
-          <button type="submit" className="auth-button">S'inscrire</button>
+          <button 
+            type="submit" 
+            className="auth-button"
+            disabled={status === 'loading'}
+          >
+            {status === 'loading' ? 'Inscription...' : 'S\'inscrire'}
+          </button>
         </form>
         <p className="auth-link">
           Déjà inscrit ? <Link to="/login">Se connecter</Link>

@@ -1,0 +1,104 @@
+.post-card {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.post-card:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.post-card h3 {
+    font-size: 1rem;
+    margin: 0 0 5px 0;
+    color: #000;
+}
+
+.post-content {
+    margin: 0;
+    color: #000;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.post-footer {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: #536471;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #536471;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.delete-btn:hover {
+    background-color: rgba(244, 33, 46, 0.1);
+    color: rgb(244, 33, 46);
+}
+
+.post-actions {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+    padding-top: 5px;
+}
+
+.like-btn, .edit-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.like-btn {
+    background: none;
+    border: none;
+    color: #536471;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.like-btn:hover {
+    background-color: rgba(249, 24, 128, 0.1);
+    color: rgb(249, 24, 128);
+}
+
+.edit-btn {
+    background-color: #4169e1;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #0000cd;
+}
+
+.post-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.post-card form input,
+.post-card form textarea {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.post-card form textarea {
+    min-height: 100px;
+    resize: vertical;
+}

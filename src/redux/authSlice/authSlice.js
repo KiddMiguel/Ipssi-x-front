@@ -1,24 +1,32 @@
-import {  createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { register, login } from './authThunk';
+
+const loadInitialState = () => {
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+    return {
+        isAuthenticated: !!token,
+        isNew: false,
+        user: user,
+        token: token,
+        status: 'idle',
+        error: null
+    };
+};
 
 export const authSlice = createSlice({
     name: 'auth',
-    initialState: {
-        isAuthenticated: false,
-        isNew : false,
-        user : null,
-        status: 'idle',
-        error: null
-    },
+    initialState: loadInitialState(),
 
-    reducers : {
-        logout : (state) => {
+    reducers: {
+        logout: (state) => {
             state.isAuthenticated = false;
             state.isNew = false;
             state.user = null;
+            state.token = null;
         }
     },
-    extraReducers : (builder) => {
+    extraReducers: (builder) => {
         // Register
         builder.addCase(register.pending, (state) => {
             state.status = 'loading';
@@ -27,7 +35,8 @@ export const authSlice = createSlice({
             state.status = 'success';
             state.isAuthenticated = true;
             state.isNew = true;
-            state.user = action.payload;
+            state.user = action.payload.user;
+            state.token = action.payload.token;
         });
         builder.addCase(register.rejected, (state, action) => {
             state.status = 'failed';
@@ -42,7 +51,8 @@ export const authSlice = createSlice({
             state.status = 'success';
             state.isAuthenticated = true;
             state.isNew = false;
-            state.user = action.payload;
+            state.user = action.payload.user;
+            state.token = action.payload.token;
         });
         builder.addCase(login.rejected, (state, action) => {
             state.status = 'failed';
