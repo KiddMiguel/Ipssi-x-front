@@ -1,21 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PostCard from '../components/PostCard/PostCard';
 import PostForm from '../components/PostForm/PostForm';
-import { getPosts } from '../redux/postSlice/postSlice';
+import {  getPosts, getPostsBefore } from '../redux/postSlice/postSlice';
 import '../assets/styles/pages/Posts.css';
 
 const Posts = () => {
     const dispatch = useDispatch();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { posts, status } = useSelector((state) => state.post);
+    const { posts, status, loading, hasMore } = useSelector((state) => state.post);
     const { user } = useSelector((state) => state.auth);
+    const observer = useRef();
+
+    console.log('posts:', posts);
+    
+    const lastPostElementRef = useCallback(node => {
+        if (loading) return;
+        if (observer.current) observer.current.disconnect();
+        
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore) {
+                dispatch(getPostsBefore());
+            }
+        });
+        
+        if (node) observer.current.observe(node);
+    }, [loading, hasMore]);
 
     useEffect(() => {
-        dispatch(getPosts());
-    }, [dispatch]);
-
-    if (status === 'loading') return <div className="loading">Chargement...</div>;
+        dispatch(getPostsBefore());
+    }, []);
 
     return (
         <div className="posts-container">
@@ -32,9 +46,16 @@ const Posts = () => {
             </div>
 
             <div className="posts-timeline">
-                {posts.map((post) => (
-                    <PostCard key={post._id} post={post} />
+                {posts.map((post, index) => (
+                    <div 
+                        key={post._id}
+                        ref={index === posts.length - 1 ? lastPostElementRef : null}
+                    >
+                        <PostCard post={post} />
+                    </div>
                 ))}
+                {loading && <div className="loading">Chargement...</div>}
+                {!hasMore && <div className="no-more-posts">Plus de posts disponibles</div>}
             </div>
 
             {isModalOpen && (

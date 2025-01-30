@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { addPost, getPosts, deletePost, getPostsBefore } from './postThunk';
+import {getPosts, addPost, deletePost, getPostsBefore } from './postThunk';
 
 export const postSlice = createSlice({
     name: 'post',
@@ -36,26 +36,31 @@ export const postSlice = createSlice({
         });
 
         // Get Posts
-        builder.addCase(getPosts.pending, (state) => {
-            state.status = 'loading';
-        });
-        builder.addCase(getPosts.fulfilled, (state, action) => {
-            state.status = 'success';
-            state.posts = action.payload;
-        });
-        builder.addCase(getPosts.rejected, (state, action) => {
-            state.status = 'failed';
-            state.error = action.error.message || null;
-        });
+        // builder.addCase(getPosts.pending, (state) => {
+        //     state.status = 'loading';
+        // });
+        // builder.addCase(getPosts.fulfilled, (state, action) => {
+        //     state.status = 'success';
+        //     state.posts = action.payload;
+        // });
+        // builder.addCase(getPosts.rejected, (state, action) => {
+        //     state.status = 'failed';
+        //     state.error = action.error.message || null;
+        // });
 
         // Delete Post
         builder.addCase(deletePost.pending, (state) => {
             state.status = 'loading';
         });
         builder.addCase(deletePost.fulfilled, (state, action) => {
-            state.status = 'success';
-            state.posts = state.posts.filter(post => post._id !== action.payload);
-        });
+            state.loading = false;
+				if (action.payload.length === 0) {
+					state.hasMore = false;
+				} else {
+					state.posts = [...state.posts, ...action.payload];
+					state.lastTimestamp = action.payload[action.payload.length - 1].createdAt;
+				}
+            });
         builder.addCase(deletePost.rejected, (state, action) => {
             state.status = 'failed';
             state.error = action.error.message || null;
@@ -64,18 +69,23 @@ export const postSlice = createSlice({
 
         // Get Posts Before
         builder.addCase(getPostsBefore.pending, (state) => {
-            state.status = 'loading';
+            state.loading = true;
         });
         builder.addCase(getPostsBefore.fulfilled, (state, action) => {
-            state.status = 'success';
-            state.posts.push(...action.payload);
+            state.loading = false;
+            if (action.payload.length === 0) {
+                state.hasMore = false;
+            } else {
+                state.posts = [...state.posts, ...action.payload];
+                state.lastTimestamp = action.payload[action.payload.length - 1].createdAt;
+            }
         });
         builder.addCase(getPostsBefore.rejected, (state, action) => {
-            state.status = 'failed';
+            state.loading = false;
             state.error = action.error.message || null;
         });
     }
 });
 
 export default postSlice.reducer;
-export { addPost, getPosts, deletePost, getPostsBefore };
+export {getPosts, addPost,  deletePost, getPostsBefore };
