@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import MessageList from "../Components/MessageList/MessageList";
 import "../assets/styles/pages/Messages.css";
 import { getUsers } from "../redux/authSlice/authSlice";
+import { getConversation } from "../redux/messageSlice/messageThunk";
 
 const Messages = () => {
   const [conversations, setConversations] = useState([]);
@@ -31,7 +31,10 @@ const Messages = () => {
         .map(u => ({
           ...u,
           online: onlineUsers.some(online => online.userId === u.id),
-          lastSeen: "Il y a 5 min"
+          lastSeen: new Date(u.lastSeen).toLocaleTimeString('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit'
+            }),
         }))
         .sort((a, b) => {
           // Trier: en ligne d'abord, puis par ordre alphabétique
@@ -86,6 +89,22 @@ const Messages = () => {
               timestamp: data.timestamp,
               status: data.status
             }]);
+
+            // Mise à jour du dernier message dans les conversations
+            setConversations(prev => prev.map(conv => {
+              // Mettre à jour pour l'expéditeur et le destinataire
+              if (conv.id === data.senderId || conv.id === data.recipientId) {
+                return {
+                  ...conv,
+                  lastMessage: data.content,
+                  lastMessageTime: new Date(data.timestamp).toLocaleTimeString('fr-FR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })
+                };
+              }
+              return conv;
+            }));
             break;
 
           case 'message_history':
@@ -150,6 +169,24 @@ const Messages = () => {
     }
   };
 
+  // Ajouter cette fonction pour charger les messages
+  const loadConversationMessages = async (userId) => {
+    if (userId) {
+      try {
+        const result = await dispatch(getConversation(userId)).unwrap();
+        setMessagesList(result);
+      } catch (error) {
+        console.error("Erreur lors du chargement des messages:", error);
+      }
+    }
+  };
+
+  // Modifier la fonction de sélection d'utilisateur
+  const handleUserSelect = (conv) => {
+    setSelectedUser(conv);
+    loadConversationMessages(conv.id);
+  };
+
   if (status === "loading") return <div>Chargement...</div>;
   if (status === "failed") return <div>Erreur de chargement</div>;
 
@@ -180,7 +217,7 @@ const Messages = () => {
                   <div
                     key={conv.id}
                     className={`user-item ${selectedUser?.id === conv.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedUser(conv)}
+                    onClick={() => handleUserSelect(conv)} // Modifier ici
                   >
                     <div className="user-avatar">
                       <span>{conv.username[0].toUpperCase()}</span>
@@ -189,10 +226,20 @@ const Messages = () => {
                     <div className="user-info">
                       <div className="user-name-time">
                         <h4>{conv.username}</h4>
+                        {conv.lastMessageTime && (
+                          <span className="message-time">{conv.lastMessageTime}</span>
+                        )}
                       </div>
-                      <p className="last-message">
-                        {conv.lastMessage || "Commencez une conversation..."}
-                      </p>
+                      {conv.lastMessage && conv.id !== selectedUser?.id && (
+                        <div className="notification-badge">
+                          <span className="notification-dot"></span>
+                          <p className="notification-preview">
+                            {conv.lastMessage.length > 25 
+                              ? conv.lastMessage.substring(0, 25) + '...' 
+                              : conv.lastMessage}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -209,7 +256,7 @@ const Messages = () => {
                   <div
                     key={conv.id}
                     className={`user-item ${selectedUser?.id === conv.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedUser(conv)}
+                    onClick={() => handleUserSelect(conv)}
                   >
                     <div className="user-avatar">
                       <span>{conv.username[0].toUpperCase()}</span>
@@ -240,8 +287,18 @@ const Messages = () => {
                 }`}>
                   {onlineUsers.some(u => u.userId === selectedUser.id) ? 'En ligne' : 'Hors ligne'}
                 </span>
-                {isTyping && <span className="typing-indicator">écrit...</span>}
               </div>
+              {/* Indicateur de frappe déplacé et amélioré */}
+              {isTyping && (
+                <div className="typing-indicator-container">
+                  <div className="typing-animation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                  <span className="typing-text">{selectedUser.username} écrit...</span>
+                </div>
+              )}
             </div>
             <div className="messages-list">
               {messagesList.map((message) => (
@@ -277,7 +334,7 @@ const Messages = () => {
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
                 onKeyPress={handleTyping}
-                placeholder="Écrivez votre message..."
+                placeholder= {isTyping ? "En train d'écrire... Humm👀" : "Tapez un message..."}
               />
               <button type="submit">Envoyer</button>
             </form>

@@ -15,16 +15,13 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const result = await dispatch(login(formData));
-      console.log('result:', result);
-      if (result) {
-        navigate('/dashboard');
-      }
-    } catch (error) {
-      console.error('Erreur de connexion:', error);
-    }
+        dispatch(login(formData));
   };
+
+    // Inscription okay
+    if (status === 'success') {
+      navigate('/posts');
+    }
 
   return (
     <div className="auth-container">
