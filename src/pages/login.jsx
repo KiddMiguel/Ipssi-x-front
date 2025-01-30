@@ -12,7 +12,7 @@ const Login = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, isAuthenticated } = useSelector(
+  const { loading, error, isAuthenticated, user } = useSelector(
     (state) => state.auth
   );
 
@@ -23,9 +23,9 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/scroll");
+      navigate("/scroll", { state: { userEmail: user.email } });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, user]);
 
   return (
     <div className="auth-container">

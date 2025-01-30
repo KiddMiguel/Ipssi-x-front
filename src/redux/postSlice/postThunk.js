@@ -42,9 +42,9 @@ export const getPostsBefore = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const state = getState();
-      const lastTimestamp = state.forum.lastTimestamp || Date.now();
+      const lastTimestamp = state.posts.lastTimestamp || Date.now();
 
-      const response = await MyAxios.get(`forum/before/${lastTimestamp}`);
+      const response = await myAxios.get(`forum/before/${lastTimestamp}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data || "Erreur inconnue");

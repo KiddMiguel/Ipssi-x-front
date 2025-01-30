@@ -20,6 +20,9 @@ const Posts = () => {
 
   return (
     <div className="posts-container">
+      <div>
+        <Message />
+      </div>
       <div className="posts-header">
         <h2>Accueil</h2>
         {user && (
@@ -51,9 +54,6 @@ const Posts = () => {
           </div>
         </div>
       )}
-      <div>
-        <Message />
-      </div>
     </div>
   );
 };
