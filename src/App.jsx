@@ -7,6 +7,7 @@ import Register from './pages/register';
 import Posts from './pages/Posts';
 import ProtectedRoute from './pages/protectedRoute';
 import { useSelector } from 'react-redux';
+import Messages from './pages/Messages';
 
 function App() {
 
@@ -29,8 +30,17 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/messages" 
+              element={
+                <ProtectedRoute>
+                  <Messages />
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
         </main>
+
         <Footer />
       </div>
     </Router>
