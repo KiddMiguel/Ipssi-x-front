@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { register, login } from './authThunk';
+import { register, login, getUsers} from './authThunk';
 
 const loadInitialState = () => {
     const token = localStorage.getItem('token');
@@ -10,7 +10,8 @@ const loadInitialState = () => {
         user: user,
         token: token,
         status: 'idle',
-        error: null
+        error: null,
+        users: []
     };
 };
 
@@ -59,10 +60,24 @@ export const authSlice = createSlice({
             state.error = action.error.message || null;
         });
 
+
+        // Get users
+        builder.addCase(getUsers.pending, (state) => {
+            state.status = 'loading';
+        });
+        builder.addCase(getUsers.fulfilled, (state, action) => {
+            state.status = 'success';
+            state.users = action.payload;
+        });
+        builder.addCase(getUsers.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.error.message || null;
+        });
+
     }
 });
 
 export const { logout } = authSlice.actions;
-export {register, login};
+export {register, login, getUsers};
 export default authSlice.reducer;
 

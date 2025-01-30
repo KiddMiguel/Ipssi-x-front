@@ -1,6 +1,7 @@
 .message-list {
   overflow-y: auto;
-  height: calc(100% - 80px);
+  /* height: calc(100% - 80px); */
+  height: 500px;
 }
 
 .conversation-item {

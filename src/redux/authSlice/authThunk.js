@@ -18,3 +18,13 @@ export const login = createAsyncThunk('auth/login', async (data, { rejectWithVal
         return rejectWithValue(error.response.data);
     }
 });
+
+// Recupérer les users 
+export const getUsers = createAsyncThunk('auth/getUsers', async (_, { rejectWithValue }) => {
+    try {
+        const response = await myAxios.get('/api/auth/users');
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response.data);
+    }
+});
