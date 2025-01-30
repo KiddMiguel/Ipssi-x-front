@@ -1,18 +1,31 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import '../styles/auth.css';
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { loginUser } from "../redux/authSlice/authThunk";
+import "../styles/auth.css";
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, error, isAuthenticated } = useSelector(
+    (state) => state.auth
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Logique de connexion à implémenter
-    console.log('Login attempt:', formData);
+    dispatch(loginUser(formData));
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/scroll");
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <div className="auth-container">
@@ -24,7 +37,9 @@ const Login = () => {
               type="email"
               placeholder="Email"
               value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
             />
           </div>
           <div className="form-group">
@@ -32,10 +47,15 @@ const Login = () => {
               type="password"
               placeholder="Mot de passe"
               value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
             />
           </div>
-          <button type="submit" className="auth-button">Se connecter</button>
+          <button type="submit" className="auth-button" disabled={loading}>
+            {loading ? "Loading..." : "Se connecter"}
+          </button>
+          {error && <p className="error">{error.message}</p>}
         </form>
         <p className="auth-link">
           Pas encore de compte ? <Link to="/register">S'inscrire</Link>
